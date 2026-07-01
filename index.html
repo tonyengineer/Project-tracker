@@ -1,76 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="indigo">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" id="metaTheme" content="#0F0F14">
+  <meta name="theme-color" content="#000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
   <title>Daily Tasks</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Design tokens (default: indigo) ─────────────── */
     :root {
-      --accent:     #7C7CFF;
-      --accent-dim: rgba(124,124,255,0.16);
-      --bg:         #0F0F14;
-      --card:       #1A1A22;
-      --card2:      #24242E;
-      --text:       #EBEBF5;
-      --muted:      #8E8E9A;
-      --done-color: #32D74B;
-      --done-bg:    rgba(50,215,75,0.11);
-      --undone:     #33333E;
-      --danger:     #FF453A;
-      --radius:     14px;
-      --nav-h:      66px;
+      --bg:     #000;
+      --card:   #0F0F0F;
+      --card2:  #1A1A1A;
+      --card3:  #262626;
+      --text:   #FFF;
+      --muted:  #555;
+      --radius: 16px;
     }
 
-    [data-theme="cobalt"] {
-      --accent:     #4FA8FF;
-      --accent-dim: rgba(79,168,255,0.16);
-      --bg:         #0A1220;
-      --card:       #131E30;
-      --card2:      #1B2840;
-      --undone:     #1E2E42;
-    }
-
-    [data-theme="emerald"] {
-      --accent:     #2ECC71;
-      --accent-dim: rgba(46,204,113,0.15);
-      --bg:         #091510;
-      --card:       #102018;
-      --card2:      #172A20;
-      --undone:     #1A3025;
-    }
-
-    [data-theme="amber"] {
-      --accent:     #FFB830;
-      --accent-dim: rgba(255,184,48,0.15);
-      --bg:         #141008;
-      --card:       #201A0A;
-      --card2:      #2C2410;
-      --undone:     #352A12;
-    }
-
-    [data-theme="rose"] {
-      --accent:     #FF2D6E;
-      --accent-dim: rgba(255,45,110,0.16);
-      --bg:         #12080F;
-      --card:       #1E0E1A;
-      --card2:      #2A1224;
-      --undone:     #351828;
-    }
-
-    /* ── Base ──────────────────────────────────────────── */
     html, body { height: 100%; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
       max-width: 480px;
@@ -78,345 +34,108 @@
       overflow: hidden;
     }
 
-    /* ── Main page ─────────────────────────────────────── */
-    #pageMain {
-      height: 100%;
+    /* ── Horizontal slider ─────────────────────────── */
+    #slider {
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      width: 200%;
+      height: 100dvh;
+      transform: translateX(0);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
     }
 
-    /* ── Header ────────────────────────────────────────── */
+    .slide {
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── App header ────────────────────────────────── */
     .app-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 20px 14px;
-      padding-top: calc(20px + env(safe-area-inset-top, 0px));
+      padding: 18px 20px 12px;
+      padding-top: calc(18px + env(safe-area-inset-top, 0px));
       flex-shrink: 0;
     }
 
     .app-title {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 700;
-      letter-spacing: -0.6px;
+      letter-spacing: -0.5px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .add-fab {
-      width: 44px;
-      height: 44px;
-      border: none;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-size: 28px;
-      line-height: 1;
+    .header-right {
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.45);
-      transition: transform 0.12s, opacity 0.12s;
-    }
-
-    .add-fab:active { transform: scale(0.89); opacity: 0.85; }
-
-    /* ── Chart ─────────────────────────────────────────── */
-    .chart-area {
-      display: flex;
-      justify-content: center;
-      padding: 4px 20px 18px;
+      gap: 10px;
       flex-shrink: 0;
     }
 
-    .chart-wrap {
-      position: relative;
-      width: 160px;
-      height: 160px;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
     }
 
-    .chart-center {
+    /* ── Mini doughnut ─────────────────────────────── */
+    .mini-chart {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      flex-shrink: 0;
+    }
+
+    .mini-chart-label {
       position: absolute;
       inset: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
       pointer-events: none;
-    }
-
-    .chart-pct {
-      font-size: 34px;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-
-    .chart-sub {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      margin-top: 4px;
-    }
-
-    /* ── Task section ──────────────────────────────────── */
-    .task-section {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 0 16px;
-      padding-bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px));
-    }
-
-    .task-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 44px 20px;
-      color: var(--muted);
-      gap: 10px;
-    }
-
-    .empty-icon { font-size: 48px; opacity: 0.3; }
-    .empty-text { font-size: 15px; }
-
-    .task-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 15px 14px;
-      background: var(--card);
-      border-radius: var(--radius);
-      border-left: 4px solid transparent;
-      cursor: pointer;
-      min-height: 60px;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      transition: background 0.2s, border-color 0.2s, transform 0.1s;
-    }
-
-    .task-item:active { transform: scale(0.985); }
-
-    .task-item.done {
-      background: var(--done-bg);
-      border-left-color: var(--done-color);
-    }
-
-    .check-circle {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 2px solid var(--muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 13px;
-      font-weight: 700;
-      color: transparent;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-
-    .task-item.done .check-circle {
-      background: var(--done-color);
-      border-color: var(--done-color);
-      color: #fff;
-    }
-
-    .task-text {
-      flex: 1;
-      font-size: 16px;
-      line-height: 1.35;
-      word-break: break-word;
-      transition: color 0.2s;
-    }
-
-    .task-item.done .task-text {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-
-    .del-btn {
-      width: 36px;
-      height: 36px;
-      border: none;
-      border-radius: 9px;
-      background: transparent;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      opacity: 0.5;
-      -webkit-tap-highlight-color: transparent;
-      transition: opacity 0.15s, background 0.15s, color 0.15s, transform 0.1s;
-    }
-
-    .del-btn:hover  { opacity: 1; background: rgba(255,69,58,0.14); color: var(--danger); }
-    .del-btn:active { opacity: 1; background: rgba(255,69,58,0.24); color: var(--danger); transform: scale(0.90); }
-
-    /* ── Bottom nav ────────────────────────────────────── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: var(--card);
-      border-top: 1px solid rgba(255,255,255,0.06);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 8px 28px;
-      -webkit-tap-highlight-color: transparent;
-      transition: color 0.15s;
-      font-size: 11px;
-      letter-spacing: 0.2px;
-    }
-
-    .nav-btn:active { color: var(--accent); }
-    .nav-btn svg { width: 22px; height: 22px; }
-
-    /* ── Add modal ─────────────────────────────────────── */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      z-index: 200;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s;
-    }
-
-    .modal-backdrop.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal-sheet {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card);
-      border-radius: 22px 22px 0 0;
-      padding: 12px 20px;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.34, 1.1, 0.64, 1);
-    }
-
-    .modal-backdrop.open .modal-sheet { transform: translateY(0); }
-
-    .modal-handle {
-      width: 38px;
-      height: 4px;
-      background: var(--card2);
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
-
-    .modal-heading {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      margin-bottom: 14px;
-    }
-
-    .modal-input {
-      width: 100%;
-      height: 52px;
-      padding: 0 16px;
-      font-size: 16px;
-      color: var(--text);
-      background: var(--card2);
-      border: 2px solid transparent;
-      border-radius: var(--radius);
-      outline: none;
-      -webkit-appearance: none;
-      transition: border-color 0.2s;
-    }
-
-    .modal-input::placeholder { color: var(--muted); }
-    .modal-input:focus { border-color: var(--accent); }
-
-    .modal-confirm {
-      width: 100%;
-      height: 52px;
-      margin-top: 12px;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: #fff;
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: opacity 0.15s, transform 0.1s;
       letter-spacing: -0.2px;
     }
 
-    .modal-confirm:active { opacity: 0.83; transform: scale(0.98); }
-
-    /* ── Settings page ─────────────────────────────────── */
-    #pageSettings {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 100%;
-      max-width: 480px;
-      transform: translateX(-50%) translateY(100%);
-      transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
-      background: var(--bg);
-      z-index: 100;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    #pageSettings.open { transform: translateX(-50%) translateY(0); }
-
-    .settings-header {
+    /* ── FAB ───────────────────────────────────────── */
+    .fab {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #FFF;
+      color: #000;
+      font-size: 24px;
+      line-height: 1;
+      border: none;
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 20px 20px 12px;
-      padding-top: calc(20px + env(safe-area-inset-top, 0px));
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.12s, opacity 0.12s;
     }
 
+    .fab:active { transform: scale(0.88); opacity: 0.75; }
+
+    /* ── Back button ───────────────────────────────── */
     .back-btn {
-      width: 36px;
-      height: 36px;
-      border: none;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: var(--card2);
+      border: none;
       color: var(--text);
       display: flex;
       align-items: center;
@@ -427,337 +146,621 @@
       transition: opacity 0.15s;
     }
 
-    .back-btn:active { opacity: 0.6; }
+    .back-btn:active { opacity: 0.5; }
 
-    .settings-page-title {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-    }
-
-    .settings-body { padding: 16px 20px 48px; }
-
-    .settings-group-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
-
-    .theme-row {
-      display: flex;
-      gap: 16px;
-      overflow-x: auto;
-      padding: 4px 2px 14px;
+    /* ── Scrollable sections ───────────────────────── */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      padding: 0 16px;
+      padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px));
     }
 
-    .theme-row::-webkit-scrollbar { display: none; }
-
-    .theme-btn {
+    /* ── Empty state ───────────────────────────────── */
+    .empty {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 9px;
-      background: none;
+      padding: 52px 20px;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 38px; opacity: 0.25; }
+    .empty-text { font-size: 14px; }
+
+    /* ── Task list ─────────────────────────────────── */
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--card);
+      border-radius: var(--radius);
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      min-height: 56px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: background 0.18s, border-color 0.18s, transform 0.1s;
+    }
+
+    .task-row:active { transform: scale(0.983); }
+
+    .task-row.done {
+      border-left-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: transparent;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+    }
+
+    .task-row.done .check {
+      background: #FFF;
+      border-color: #FFF;
+      color: #000;
+    }
+
+    .task-label {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.35;
+      word-break: break-word;
+      transition: color 0.18s;
+    }
+
+    .task-row.done .task-label {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .del {
+      width: 32px;
+      height: 32px;
       border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      padding: 4px 2px;
+      opacity: 0.35;
       -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s, transform 0.1s;
     }
 
-    .theme-swatch {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      outline: 3px solid transparent;
-      outline-offset: 3px;
-      transition: outline-color 0.2s, transform 0.15s;
+    .del:active { opacity: 1; transform: scale(0.87); }
+
+    /* ── Project cards ─────────────────────────────── */
+    .proj-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .proj-card {
+      height: calc((100dvh - 90px) / 3 - 6px);
+      min-height: 130px;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, transform 0.1s;
     }
 
-    .theme-btn:active .theme-swatch { transform: scale(0.91); }
-    .theme-btn.active .theme-swatch  { outline-color: var(--text); }
+    .proj-card:active { transform: scale(0.974); background: var(--card2); }
 
-    .theme-name {
-      font-size: 12px;
-      color: var(--muted);
-      transition: color 0.2s;
+    .proj-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
     }
 
-    .theme-btn.active .theme-name {
+    .proj-meta { font-size: 12px; color: var(--muted); }
+
+    /* ── Project detail overlay ────────────────────── */
+    #projOverlay {
+      position: fixed;
+      inset: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--bg);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #projOverlay.open { transform: translateX(0); }
+
+    /* ── Page indicator dots ───────────────────────── */
+    #dots {
+      position: fixed;
+      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .dot {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--card2);
+      transition: width 0.25s, background 0.25s;
+      width: 6px;
+    }
+
+    .dot.on {
+      width: 20px;
+      background: #FFF;
+    }
+
+    /* ── Modals ────────────────────────────────────── */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+    }
+
+    .modal-bg.open { opacity: 1; pointer-events: all; }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      padding: 12px 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.34, 1.08, 0.64, 1);
+    }
+
+    .modal-bg.open .modal-sheet { transform: translateY(0); }
+
+    .modal-pill {
+      width: 36px; height: 4px;
+      background: var(--card3);
+      border-radius: 2px;
+      margin: 0 auto 18px;
+    }
+
+    .modal-heading {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: -0.2px;
+    }
+
+    .modal-input {
+      width: 100%;
+      height: 50px;
+      padding: 0 16px;
+      font-size: 16px;
       color: var(--text);
-      font-weight: 600;
+      background: var(--card2);
+      border: 1.5px solid transparent;
+      border-radius: 12px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s;
     }
 
-    /* ── Divider ───────────────────────────────────────── */
-    .settings-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.06);
-      margin: 24px 0;
+    .modal-input::placeholder { color: var(--muted); }
+    .modal-input:focus { border-color: #FFF; }
+
+    .modal-btn {
+      width: 100%;
+      height: 50px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 12px;
+      background: #FFF;
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s, transform 0.1s;
     }
+
+    .modal-btn:active { opacity: 0.82; transform: scale(0.98); }
   </style>
 </head>
 <body>
 
-  <!-- ══ Main page ═══════════════════════════════════ -->
-  <div id="pageMain">
+  <!-- ══════════ Horizontal slider ══════════ -->
+  <div id="slider">
+
+    <!-- Slide 0 · Daily Tasks -->
+    <div class="slide" id="slideDaily">
+      <header class="app-header">
+        <h1 class="app-title">Daily Tasks</h1>
+        <div class="header-right">
+          <div class="mini-chart">
+            <canvas id="dailyCanvas"></canvas>
+            <div class="mini-chart-label" id="dailyPct">0%</div>
+          </div>
+          <button class="fab" id="addDailyBtn" aria-label="Add task">+</button>
+        </div>
+      </header>
+      <div class="scroll-area">
+        <div class="task-list" id="dailyList">
+          <div class="empty" id="dailyEmpty">
+            <span class="empty-icon">📋</span>
+            <span class="empty-text">No tasks yet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 1 · Projects -->
+    <div class="slide" id="slideProjects">
+      <header class="app-header">
+        <h1 class="app-title">Projects</h1>
+        <div class="header-right">
+          <button class="fab" id="addProjBtn" aria-label="New project">+</button>
+        </div>
+      </header>
+      <div class="scroll-area">
+        <div class="proj-list" id="projList">
+          <div class="empty" id="projsEmpty">
+            <span class="empty-icon">🗂</span>
+            <span class="empty-text">No projects yet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ Project detail overlay ══════════ -->
+  <div id="projOverlay">
     <header class="app-header">
-      <h1 class="app-title">Daily Tasks</h1>
-      <button class="add-fab" id="addFab" aria-label="Add task">+</button>
-    </header>
-
-    <div class="chart-area">
-      <div class="chart-wrap">
-        <canvas id="progressChart"></canvas>
-        <div class="chart-center">
-          <span class="chart-pct" id="pctLabel">0%</span>
-          <span class="chart-sub">done</span>
-        </div>
+      <div class="header-left">
+        <button class="back-btn" id="backBtn" aria-label="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h1 class="app-title" id="overlayTitle">Project</h1>
       </div>
-    </div>
-
-    <div class="task-section">
-      <div class="task-list" id="taskList">
-        <div class="empty-state" id="emptyState">
+      <div class="header-right">
+        <div class="mini-chart">
+          <canvas id="projCanvas"></canvas>
+          <div class="mini-chart-label" id="projPct">0%</div>
+        </div>
+        <button class="fab" id="addProjTaskBtn" aria-label="Add task">+</button>
+      </div>
+    </header>
+    <div class="scroll-area">
+      <div class="task-list" id="projTaskList">
+        <div class="empty" id="projEmpty">
           <span class="empty-icon">📋</span>
-          <span class="empty-text">No tasks yet — tap + to add one!</span>
+          <span class="empty-text">No tasks yet</span>
         </div>
       </div>
     </div>
-
-    <nav class="bottom-nav">
-      <button class="nav-btn" id="openSettingsBtn" aria-label="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        Settings
-      </button>
-    </nav>
   </div>
 
-  <!-- ══ Add task modal ══════════════════════════════ -->
-  <div class="modal-backdrop" id="addModal">
+  <!-- ══════════ Page indicator ══════════ -->
+  <div id="dots">
+    <span class="dot on"  id="dot0"></span>
+    <span class="dot"     id="dot1"></span>
+  </div>
+
+  <!-- ══════════ Add task modal ══════════ -->
+  <div class="modal-bg" id="taskModal">
     <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-heading">New Task</div>
-      <input
-        class="modal-input"
-        id="taskInput"
-        type="text"
+      <div class="modal-pill"></div>
+      <p class="modal-heading">New Task</p>
+      <input class="modal-input" id="taskInput" type="text"
         placeholder="What needs to be done?"
-        maxlength="200"
-        autocomplete="off"
-        autocorrect="on"
-        autocapitalize="sentences"
-        inputmode="text"
-      >
-      <button class="modal-confirm" id="confirmAddBtn">Add Task</button>
+        maxlength="200" autocomplete="off" autocorrect="on"
+        autocapitalize="sentences" inputmode="text">
+      <button class="modal-btn" id="confirmTask">Add Task</button>
     </div>
   </div>
 
-  <!-- ══ Settings page ═══════════════════════════════ -->
-  <div id="pageSettings">
-    <header class="settings-header">
-      <button class="back-btn" id="backBtn" aria-label="Back">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-      </button>
-      <span class="settings-page-title">Settings</span>
-    </header>
-
-    <div class="settings-body">
-      <div class="settings-group-label">Color Theme</div>
-      <div class="theme-row" id="themeRow"></div>
+  <!-- ══════════ Add project modal ══════════ -->
+  <div class="modal-bg" id="projModal">
+    <div class="modal-sheet">
+      <div class="modal-pill"></div>
+      <p class="modal-heading">New Project</p>
+      <input class="modal-input" id="projInput" type="text"
+        placeholder="Project name"
+        maxlength="80" autocomplete="off" autocorrect="on"
+        autocapitalize="words" inputmode="text">
+      <button class="modal-btn" id="confirmProj">Create</button>
     </div>
   </div>
 
   <script>
-    /* ── PWA manifest ──────────────────────────────────── */
+    /* ── PWA manifest ────────────────────────────────── */
     (() => {
       const icon = encodeURIComponent(
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">` +
-        `<rect width="192" height="192" rx="40" fill="#7C7CFF"/>` +
-        `<text y="140" x="96" text-anchor="middle" font-size="120" fill="white">✓</text></svg>`
+        `<rect width="192" height="192" rx="40" fill="#FFF"/>` +
+        `<text y="140" x="96" text-anchor="middle" font-size="120" fill="#000">✓</text></svg>`
       );
-      const m = { name:"Daily Tasks", short_name:"Tasks", start_url:".", display:"standalone",
-        background_color:"#0F0F14", theme_color:"#0F0F14",
-        icons:[{ src:"data:image/svg+xml,"+icon, sizes:"192x192", type:"image/svg+xml", purpose:"any maskable" }] };
-      const link = Object.assign(document.createElement('link'), {
-        rel: 'manifest',
-        href: URL.createObjectURL(new Blob([JSON.stringify(m)], { type:'application/manifest+json' }))
-      });
+      const link = document.createElement('link');
+      link.rel  = 'manifest';
+      link.href = URL.createObjectURL(new Blob([JSON.stringify({
+        name:'Daily Tasks', short_name:'Tasks', start_url:'.', display:'standalone',
+        background_color:'#000', theme_color:'#000',
+        icons:[{ src:'data:image/svg+xml,'+icon, sizes:'192x192', type:'image/svg+xml', purpose:'any maskable' }]
+      })], { type:'application/manifest+json' }));
       document.head.appendChild(link);
     })();
 
-    /* ── Themes ────────────────────────────────────────── */
-    const THEMES = [
-      { id:'indigo',  name:'Indigo',  accent:'#7C7CFF', bg:'#0F0F14', undone:'#33333E' },
-      { id:'cobalt',  name:'Cobalt',  accent:'#4FA8FF', bg:'#0A1220', undone:'#1E2E42' },
-      { id:'emerald', name:'Emerald', accent:'#2ECC71', bg:'#091510', undone:'#1A3025' },
-      { id:'amber',   name:'Amber',   accent:'#FFB830', bg:'#141008', undone:'#352A12' },
-      { id:'rose',    name:'Rose',    accent:'#FF2D6E', bg:'#12080F', undone:'#351828' },
-    ];
+    /* ── State ───────────────────────────────────────── */
+    let dailyTasks     = JSON.parse(localStorage.getItem('pwa_tasks')  || '[]');
+    let projects       = JSON.parse(localStorage.getItem('projects')   || '[]');
+    let currentPage    = 0;
+    let activeProjId   = null;
+    let taskModalMode  = 'daily'; // 'daily' | 'proj'
 
-    let activeTheme = localStorage.getItem('theme') || 'indigo';
+    const save = {
+      daily:    () => localStorage.setItem('pwa_tasks', JSON.stringify(dailyTasks)),
+      projects: () => localStorage.setItem('projects',  JSON.stringify(projects)),
+    };
 
-    function applyTheme(id) {
-      activeTheme = id;
-      document.documentElement.dataset.theme = id;
-      const t = THEMES.find(x => x.id === id);
-      document.getElementById('metaTheme').content = t.bg;
-      localStorage.setItem('theme', id);
-      renderThemeButtons();
-      updateChart();
-    }
-
-    function renderThemeButtons() {
-      const row = document.getElementById('themeRow');
-      row.innerHTML = '';
-      THEMES.forEach(t => {
-        const btn = document.createElement('button');
-        btn.className = 'theme-btn' + (t.id === activeTheme ? ' active' : '');
-        btn.setAttribute('aria-label', t.name + ' theme');
-        btn.innerHTML =
-          `<div class="theme-swatch" style="background:${t.accent}"></div>` +
-          `<span class="theme-name">${t.name}</span>`;
-        btn.addEventListener('click', () => applyTheme(t.id));
-        row.appendChild(btn);
-      });
-    }
-
-    /* ── State ─────────────────────────────────────────── */
-    let tasks = JSON.parse(localStorage.getItem('pwa_tasks') || '[]');
-    function save() { localStorage.setItem('pwa_tasks', JSON.stringify(tasks)); }
-
-    /* ── Chart ─────────────────────────────────────────── */
-    const progressChart = new Chart(
-      document.getElementById('progressChart').getContext('2d'),
-      {
+    /* ── Charts ──────────────────────────────────────── */
+    function makeChart(id) {
+      return new Chart(document.getElementById(id).getContext('2d'), {
         type: 'doughnut',
-        data: { datasets: [{ data:[1], backgroundColor:['#33333E'], borderWidth:0, hoverOffset:0 }] },
+        data: { datasets: [{ data:[1], backgroundColor:['#1C1C1C'], borderWidth:0, hoverOffset:0 }] },
         options: {
-          cutout: '72%',
-          animation: { duration:450, easing:'easeInOutQuart' },
+          cutout: '70%',
+          animation: { duration:400, easing:'easeInOutQuart' },
           plugins: { tooltip:{ enabled:false }, legend:{ display:false } },
           events: []
         }
-      }
-    );
-
-    function updateChart() {
-      const total = tasks.length;
-      const done  = tasks.filter(t => t.done).length;
-      const theme = THEMES.find(x => x.id === activeTheme);
-      const ds    = progressChart.data.datasets[0];
-
-      document.getElementById('pctLabel').textContent =
-        total === 0 ? '0%' : Math.round(done / total * 100) + '%';
-
-      if (total === 0 || done === 0) {
-        ds.data = [1]; ds.backgroundColor = [theme.undone];
-      } else if (done === total) {
-        ds.data = [1]; ds.backgroundColor = ['#32D74B'];
-      } else {
-        ds.data = [done, total - done]; ds.backgroundColor = ['#32D74B', theme.undone];
-      }
-      progressChart.update();
+      });
     }
 
-    /* ── Render tasks ──────────────────────────────────── */
+    const dailyChart = makeChart('dailyCanvas');
+    const projChart  = makeChart('projCanvas');
+
+    function syncChart(chart, pctEl, tasks) {
+      const total = tasks.length;
+      const done  = tasks.filter(t => t.done).length;
+      const ds    = chart.data.datasets[0];
+      pctEl.textContent = total === 0 ? '0%' : Math.round(done / total * 100) + '%';
+      if (total === 0 || done === 0) {
+        ds.data = [1]; ds.backgroundColor = ['#1C1C1C'];
+      } else if (done === total) {
+        ds.data = [1]; ds.backgroundColor = ['#FFF'];
+      } else {
+        ds.data = [done, total - done]; ds.backgroundColor = ['#FFF','#1C1C1C'];
+      }
+      chart.update();
+    }
+
+    /* ── Task list renderer ──────────────────────────── */
     function escHtml(s) {
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function render() {
-      const list  = document.getElementById('taskList');
-      const empty = document.getElementById('emptyState');
-      list.querySelectorAll('.task-item').forEach(el => el.remove());
+    function renderTasks(tasks, listEl, emptyEl, onToggle, onDelete) {
+      listEl.querySelectorAll('.task-row').forEach(el => el.remove());
+      emptyEl.style.display = tasks.length === 0 ? '' : 'none';
+      tasks.forEach((task, i) => {
+        const el = document.createElement('div');
+        el.className = 'task-row' + (task.done ? ' done' : '');
+        el.innerHTML =
+          `<div class="check">${task.done ? '✓' : ''}</div>` +
+          `<span class="task-label">${escHtml(task.text)}</span>` +
+          `<button class="del" aria-label="Delete">` +
+            `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
+              `<polyline points="3 6 5 6 21 6"/>` +
+              `<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>` +
+              `<path d="M10 11v6M14 11v6"/>` +
+              `<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>` +
+            `</svg>` +
+          `</button>`;
+        el.querySelector('.del').addEventListener('click', e => { e.stopPropagation(); onDelete(i); });
+        el.addEventListener('click', () => onToggle(i));
+        listEl.appendChild(el);
+      });
+    }
 
-      if (tasks.length === 0) {
-        empty.style.display = '';
-      } else {
-        empty.style.display = 'none';
-        tasks.forEach((task, i) => {
-          const el = document.createElement('div');
-          el.className = 'task-item' + (task.done ? ' done' : '');
-          el.innerHTML =
-            `<div class="check-circle">${task.done ? '✓' : ''}</div>` +
-            `<span class="task-text">${escHtml(task.text)}</span>` +
-            `<button class="del-btn" aria-label="Delete task">` +
-              `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
-                `<polyline points="3 6 5 6 21 6"/>` +
-                `<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>` +
-                `<path d="M10 11v6M14 11v6"/>` +
-                `<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>` +
-              `</svg>` +
-            `</button>`;
+    /* ── Daily tasks ─────────────────────────────────── */
+    function renderDaily() {
+      renderTasks(
+        dailyTasks,
+        document.getElementById('dailyList'),
+        document.getElementById('dailyEmpty'),
+        i => { dailyTasks[i].done = !dailyTasks[i].done; save.daily(); renderDaily(); },
+        i => { dailyTasks.splice(i, 1);                  save.daily(); renderDaily(); }
+      );
+      syncChart(dailyChart, document.getElementById('dailyPct'), dailyTasks);
+    }
 
-          el.querySelector('.del-btn').addEventListener('click', e => {
-            e.stopPropagation();
-            tasks.splice(i, 1);
-            save(); render();
-          });
+    /* ── Project cards ───────────────────────────────── */
+    function renderProjCards() {
+      const list  = document.getElementById('projList');
+      const empty = document.getElementById('projsEmpty');
+      list.querySelectorAll('.proj-card').forEach(el => el.remove());
+      empty.style.display = projects.length === 0 ? '' : 'none';
+      projects.forEach(p => {
+        const done  = p.tasks.filter(t => t.done).length;
+        const total = p.tasks.length;
+        const meta  = total === 0 ? 'No tasks' :
+                      done === total ? 'All done' :
+                      `${done} / ${total} done`;
+        const card = document.createElement('div');
+        card.className = 'proj-card';
+        card.innerHTML =
+          `<div class="proj-name">${escHtml(p.name)}</div>` +
+          `<div class="proj-meta">${meta}</div>`;
+        card.addEventListener('click', () => openProj(p.id));
+        list.appendChild(card);
+      });
+    }
 
-          el.addEventListener('click', () => {
-            tasks[i].done = !tasks[i].done;
-            save(); render();
-          });
+    /* ── Project detail ──────────────────────────────── */
+    function openProj(id) {
+      activeProjId = id;
+      const p = projects.find(x => x.id === id);
+      document.getElementById('overlayTitle').textContent = p.name;
+      document.getElementById('projOverlay').classList.add('open');
+      document.getElementById('dots').style.opacity = '0';
+      renderProjTasks();
+    }
 
-          list.appendChild(el);
-        });
+    function closeProj() {
+      document.getElementById('projOverlay').classList.remove('open');
+      document.getElementById('dots').style.opacity = '1';
+      activeProjId = null;
+    }
+
+    function renderProjTasks() {
+      const p = projects.find(x => x.id === activeProjId);
+      if (!p) return;
+      renderTasks(
+        p.tasks,
+        document.getElementById('projTaskList'),
+        document.getElementById('projEmpty'),
+        i => { p.tasks[i].done = !p.tasks[i].done; save.projects(); renderProjTasks(); renderProjCards(); },
+        i => { p.tasks.splice(i, 1);                save.projects(); renderProjTasks(); renderProjCards(); }
+      );
+      syncChart(projChart, document.getElementById('projPct'), p.tasks);
+    }
+
+    /* ── Page navigation ─────────────────────────────── */
+    function goTo(n) {
+      currentPage = n;
+      document.getElementById('slider').style.transform =
+        n === 0 ? 'translateX(0)' : 'translateX(-50%)';
+      document.getElementById('dot0').classList.toggle('on', n === 0);
+      document.getElementById('dot1').classList.toggle('on', n === 1);
+    }
+
+    /* ── Swipe detection ─────────────────────────────── */
+    let sx = 0, sy = 0;
+
+    document.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      if (activeProjId !== null) return;
+      if (document.querySelector('.modal-bg.open')) return;
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 55) {
+        if (dx < 0 && currentPage === 0) goTo(1);
+        if (dx > 0 && currentPage === 1) goTo(0);
       }
-      updateChart();
-    }
+    }, { passive: true });
 
-    /* ── Add task ──────────────────────────────────────── */
-    function addTask() {
-      const input = document.getElementById('taskInput');
-      const text  = input.value.trim();
-      if (!text) { input.focus(); return; }
-      tasks.push({ id: Date.now(), text, done: false });
-      input.value = '';
-      save(); render();
-      closeModal();
-    }
-
-    /* ── Modal ─────────────────────────────────────────── */
-    function openModal() {
-      document.getElementById('addModal').classList.add('open');
+    /* ── Task modal ──────────────────────────────────── */
+    function openTaskModal(mode) {
+      taskModalMode = mode;
+      document.getElementById('taskModal').classList.add('open');
       setTimeout(() => document.getElementById('taskInput').focus(), 320);
     }
 
-    function closeModal() {
-      document.getElementById('addModal').classList.remove('open');
+    function closeTaskModal() {
+      document.getElementById('taskModal').classList.remove('open');
       document.getElementById('taskInput').value = '';
     }
 
-    document.getElementById('addFab').addEventListener('click', openModal);
-    document.getElementById('confirmAddBtn').addEventListener('click', addTask);
+    function submitTask() {
+      const text = document.getElementById('taskInput').value.trim();
+      if (!text) { document.getElementById('taskInput').focus(); return; }
+      if (taskModalMode === 'daily') {
+        dailyTasks.push({ id: Date.now(), text, done: false });
+        save.daily(); renderDaily();
+      } else {
+        const p = projects.find(x => x.id === activeProjId);
+        p.tasks.push({ id: Date.now(), text, done: false });
+        save.projects(); renderProjTasks(); renderProjCards();
+      }
+      closeTaskModal();
+    }
+
+    /* ── Project modal ───────────────────────────────── */
+    function openProjModal() {
+      document.getElementById('projModal').classList.add('open');
+      setTimeout(() => document.getElementById('projInput').focus(), 320);
+    }
+
+    function closeProjModal() {
+      document.getElementById('projModal').classList.remove('open');
+      document.getElementById('projInput').value = '';
+    }
+
+    function submitProj() {
+      const name = document.getElementById('projInput').value.trim();
+      if (!name) { document.getElementById('projInput').focus(); return; }
+      projects.push({ id: Date.now(), name, tasks: [] });
+      save.projects(); renderProjCards();
+      closeProjModal();
+    }
+
+    /* ── Wire events ─────────────────────────────────── */
+    document.getElementById('addDailyBtn').addEventListener('click',    () => openTaskModal('daily'));
+    document.getElementById('addProjTaskBtn').addEventListener('click', () => openTaskModal('proj'));
+    document.getElementById('addProjBtn').addEventListener('click',     openProjModal);
+    document.getElementById('backBtn').addEventListener('click',        closeProj);
+
+    document.getElementById('confirmTask').addEventListener('click', submitTask);
     document.getElementById('taskInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addTask();
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Enter')  submitTask();
+      if (e.key === 'Escape') closeTaskModal();
     });
-    document.getElementById('addModal').addEventListener('click', e => {
-      if (e.target === e.currentTarget) closeModal();
-    });
-
-    /* ── Settings ──────────────────────────────────────── */
-    document.getElementById('openSettingsBtn').addEventListener('click', () => {
-      document.getElementById('pageSettings').classList.add('open');
-    });
-    document.getElementById('backBtn').addEventListener('click', () => {
-      document.getElementById('pageSettings').classList.remove('open');
+    document.getElementById('taskModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeTaskModal();
     });
 
-    /* ── Boot ──────────────────────────────────────────── */
-    applyTheme(activeTheme);
-    render();
+    document.getElementById('confirmProj').addEventListener('click', submitProj);
+    document.getElementById('projInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter')  submitProj();
+      if (e.key === 'Escape') closeProjModal();
+    });
+    document.getElementById('projModal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeProjModal();
+    });
+
+    /* ── Boot ────────────────────────────────────────── */
+    renderDaily();
+    renderProjCards();
   </script>
 </body>
 </html>
